@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Bouquet For Anukis ❤</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Dancing Script', 'cursive'],
+            handwritten: ['Caveat', 'cursive'],
+            sans: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            roseGold: '#e8a598',
+            blush: '#fbe4e8',
+            burgundy: '#590d22',
+            deepVelvet: '#2b0910',
+            romanticPink: '#ff4d6d'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Floating Hearts Canvas background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Glassmorphism Styles */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 15px 35px rgba(89, 13, 34, 0.15);
+    }
+
+    .glass-card-dark {
+      background: rgba(43, 9, 16, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Glow pulse effect */
+    .glow-button {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .glow-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .glow-button:hover::after {
+      opacity: 1;
+    }
+
+    /* Polaroid styling with realistic tape and rotation */
+    .polaroid-frame {
+      background: #ffffff;
+      padding: 12px 12px 36px 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.12);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .polaroid-frame::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 90px;
+      height: 26px;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      backdrop-filter: blur(2px);
+      z-index: 10;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .polaroid-frame:hover {
+      transform: scale(1.06) rotate(0deg) !important;
+      z-index: 20;
+      box-shadow: 0 20px 40px rgba(255, 77, 109, 0.25);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #fbe4e8;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff4d6d;
+      border-radius: 10px;
+    }
+
+    /* Floating heart animation element on click */
+    .click-heart {
+      position: fixed;
+      pointer-events: none;
+      animation: floatUpAndFade 1.2s ease-out forwards;
+      z-index: 9999;
+    }
+
+    @keyframes floatUpAndFade {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+      }
+      50% {
+        transform: translate(-50%, -100px) scale(1.2) rotate(15deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -180px) scale(1.5) rotate(-15deg);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#fce4ec] via-[#f8bbd0] to-[#f48fb1] min-h-screen font-sans text-burgundy overflow-x-hidden relative">
+
+  <!-- Background Animated Hearts Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Lock Screen Overlay -->
+  <div id="lock-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-[#3b0712] via-[#590d22] to-[#800f2f] transition-all duration-1000 ease-in-out">
+    <div class="glass-card-dark p-8 md:p-12 rounded-3xl text-center max-w-lg w-full text-white border border-roseGold/30 shadow-2xl transform transition-transform duration-500 hover:scale-[1.01]">
+      
+      <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-tr from-romanticPink to-roseGold flex items-center justify-center shadow-lg shadow-romanticPink/40 animate-pulse">
+        <i class="fa-solid font-bold fa-heart text-3xl text-white"></i>
+      </div>
+
+      <h1 class="font-serif text-3xl md:text-5xl font-bold mb-3 text-roseGold tracking-wide">
+        From: Nakosgan
+      </h1>
+      <p class="font-serif text-2xl md:text-4xl text-blush/90 mb-8 font-light italic">
+        For: Anukis ❤
+      </p>
+
+      <p class="text-sm md:text-base text-pink-100/80 mb-8 font-light leading-relaxed">
+        I prepared a tiny magical place for you... <br>Tap below to unlock your bouquet of memories.
+      </p>
+
+      <button id="unlock-btn" class="glow-button w-full py-4 px-8 bg-gradient-to-r from-romanticPink via-pink-500 to-roseGold text-white font-semibold rounded-full shadow-lg shadow-romanticPink/50 hover:shadow-xl hover:shadow-romanticPink/70 transform hover:-translate-y-1 active:translate-y-0 text-lg flex items-center justify-center gap-3 group">
+        <span>გახსნა & Play Music</span>
+        <i class="fa-solid fa-key group-hover:rotate-45 transition-transform duration-300"></i>
+      </button>
+
+      <div class="mt-6 text-xs text-roseGold/60 italic">
+        ✨ Best experienced with sound turned on
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Website Container -->
+  <main id="main-content" class="relative z-10 max-w-5xl mx-auto px-4 py-8 md:py-14 opacity-0 transition-opacity duration-1000 flex flex-col items-center gap-12">
+    
+    <!-- Header Title -->
+    <header class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 border border-white/60 text-burgundy text-xs md:text-sm font-medium shadow-sm backdrop-blur-md">
+        <i class="fa-solid fa-sparkles text-romanticPink"></i> Special Surprise for Anukis
+      </div>
+      <h1 class="font-serif text-4xl md:text-6xl font-bold text-burgundy tracking-tight drop-shadow-sm">
+        A Bouquet For You 🌹
+      </h1>
+    </header>
+
+    <!-- Floating Audio Control Widget -->
+    <div class="fixed top-5 right-5 z-40 glass-card px-4 py-2 rounded-full flex items-center gap-3 text-burgundy shadow-lg border border-white/50">
+      <button id="audio-toggle-btn" class="w-8 h-8 rounded-full bg-romanticPink text-white flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+        <i id="audio-icon" class="fa-solid fa-music text-xs"></i>
+      </button>
+      <span class="text-xs font-semibold hidden sm:inline text-burgundy/80">Our Melody</span>
+    </div>
+
+    <!-- Hidden YouTube Player IFrame for Auto Music Playback -->
+    <div class="hidden">
+      <iframe id="yt-player" width="100" height="100" src="https://www.youtube.com/embed/ULC9BdKna4s?si=DYNLXHbZtXCF2YyM&enablejsapi=1" title="Background Music"></iframe>
+    </div>
+
+    <!-- Romantic Text Card -->
+    <section class="w-full max-w-2xl">
+      <div class="glass-card p-6 md:p-10 rounded-3xl relative text-center shadow-xl border border-white/60 transform hover:scale-[1.01] transition-all">
+        <i class="fa-solid fa-quote-left text-3xl md:text-4xl text-romanticPink/30 absolute top-4 left-6"></i>
+        <p class="font-serif text-xl md:text-3xl text-burgundy leading-relaxed px-4 py-2">
+          "Sometimes I catch myself smiling at my phone just because of you... You make ordinary days feel softer, warmer and so much happier." ✨
+        </p>
+        <i class="fa-solid fa-quote-right text-3xl md:text-4xl text-romanticPink/30 absolute bottom-4 right-6"></i>
+        <div class="mt-4 font-handwritten text-2xl text-romanticPink font-bold">
+          ~ With all my love
+        </div>
+      </div>
+    </section>
+
+    <!-- Embedded YouTube Music Video Display Section -->
+    <section class="w-full max-w-2xl">
+      <div class="glass-card p-3 md:p-4 rounded-3xl shadow-2xl border border-white/70">
+        <div class="relative w-full overflow-hidden rounded-2xl shadow-inner bg-black aspect-video">
+          <iframe 
+            class="absolute top-0 left-0 w-full h-full rounded-2xl"
+            src="https://www.youtube.com/embed/AoFFZYDuNLo?si=SApsNiO3ie_WyYSo&enablejsapi=1" 
+            title="Romantic Song Video" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="py-2 px-3 text-center text-xs md:text-sm text-burgundy/70 font-medium">
+          🎵 Playing our special romantic track
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Scratch Gallery Section Header -->
+    <div class="text-center space-y-2 mt-4">
+      <h2 class="font-serif text-3xl md:text-4xl font-bold text-burgundy">
+        Our Secret Memories 📸
+      </h2>
+      <p class="text-xs md:text-sm text-burgundy/80 flex items-center justify-center gap-1">
+        <i class="fa-solid fa-hand-pointer text-romanticPink"></i> Scratch off the gold layers below to reveal the photos!
+      </p>
+    </div>
+
+    <!-- Polaroid Gallery with Real HTML5 Canvas Scratch Off Effect -->
+    <section class="w-full flex flex-wrap justify-center gap-8 md:gap-10">
+
+      <!-- Polaroid Item 1 -->
+      <div class="polaroid-frame w-72 rounded-sm rotate-[-3deg]">
+        <div class="relative w-full h-72 bg-gray-100 overflow-hidden rounded-xs border border-gray-200">
+          <img 
+            src="pic/pir.jpg" 
+            onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop'"
+            alt="Couple photo 1" 
+            class="w-full h-full object-cover select-none"
+          />
+          <canvas id="scratch-canvas-1" class="absolute top-0 left-0 w-full h-full cursor-pointer z-10"></canvas>
+        </div>
+        <div class="font-handwritten text-2xl text-center mt-3 text-gray-800 font-bold">
+          ჩვენი პირველი დღე 🤍
+        </div>
+      </div>
+
+      <!-- Polaroid Item 2 -->
+      <div class="polaroid-frame w-72 rounded-sm rotate-[4deg]">
+        <div class="relative w-full h-72 bg-gray-100 overflow-hidden rounded-xs border border-gray-200">
+          <img 
+            src="pic/meo.jpg" 
+            onerror="this.src='https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop'"
+            alt="Couple photo 2" 
+            class="w-full h-full object-cover select-none"
+          />
+          <canvas id="scratch-canvas-2" class="absolute top-0 left-0 w-full h-full cursor-pointer z-10"></canvas>
+        </div>
+        <div class="font-handwritten text-2xl text-center mt-3 text-gray-800 font-bold">
+          <3 🥰
+        </div>
+      </div>
+
+      <!-- Polaroid Item 3 -->
+      <div class="polaroid-frame w-72 rounded-sm rotate-[-2deg]">
+        <div class="relative w-full h-72 bg-gray-100 overflow-hidden rounded-xs border border-gray-200">
+          <img 
+            src="pic/mesame.jpg" 
+            onerror="this.src='https://images.unsplash.com/photo-1494774157365-9e04c6720e47?q=80&w=800&auto=format&fit=crop'"
+            alt="Couple photo 3" 
+            class="w-full h-full object-cover select-none"
+          />
+          <canvas id="scratch-canvas-3" class="absolute top-0 left-0 w-full h-full cursor-pointer z-10"></canvas>
+        </div>
+        <div class="font-handwritten text-2xl text-center mt-3 text-gray-800 font-bold">
+          ბედნიერი წუთები 🌹
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Love Notes Card Stack -->
+    <section class="w-full max-w-md my-4">
+      <div class="glass-card p-6 rounded-3xl text-center space-y-4 shadow-xl border border-white/60">
+        <h3 class="font-serif text-2xl font-bold text-burgundy flex items-center justify-center gap-2">
+          <i class="fa-solid fa-envelope-open-text text-romanticPink"></i> Little Reasons Why
+        </h3>
+        <div id="love-note-box" class="p-4 bg-white/50 rounded-2xl border border-white/80 min-h-[90px] flex items-center justify-center text-center font-medium text-burgundy text-sm md:text-base transition-all duration-300">
+          "Tap the button below to see a little reason why you mean the world to me..."
+        </div>
+        <button id="next-note-btn" class="py-2.5 px-6 bg-burgundy hover:bg-romanticPink text-white font-medium rounded-full text-xs md:text-sm shadow-md transition-colors duration-300 flex items-center justify-center gap-2 mx-auto">
+          <span>Reveal a Reason</span>
+          <i class="fa-solid fa-sparkles"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer Banner -->
+    <footer class="text-center py-6 text-xs text-burgundy/70 space-y-1">
+      <p>Made with endless love by Nakosgan for Anuki ❤</p>
+      <p class="font-serif text-sm">Forever & Always</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // --- 1. Background Floating Hearts Animation Canvas ---
+    const bgCanvas = document.getElementById('bg-canvas');
+    const ctx = bgCanvas.getContext('2d');
+    let hearts = [];
+
+    function resizeCanvas() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class HeartParticle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * bgCanvas.width;
+        this.y = bgCanvas.height + 20;
+        this.size = Math.random() * 15 + 8;
+        this.speedY = Math.random() * 1.5 + 0.6;
+        this.speedX = Math.sin(Math.random() * Math.PI) * 0.8;
+        this.opacity = Math.random() * 0.5 + 0.3;
+        this.color = `hsl(${Math.random() * 30 + 340}, 80%, 70%)`;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += Math.sin(this.y * 0.02) * 0.5;
+        if (this.y < -20) this.reset();
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        const d = this.size;
+        ctx.moveTo(this.x, this.y);
+        ctx.bezierCurveTo(this.x - d / 2, this.y - d / 2, this.x - d, this.y + d / 3, this.x, this.y + d);
+        ctx.bezierCurveTo(this.x + d, this.y + d / 3, this.x + d / 2, this.y - d / 2, this.x, this.y);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 25; i++) {
+      hearts.push(new HeartParticle());
+    }
+
+    function animateBg() {
+      ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      hearts.forEach(h => {
+        h.update();
+        h.draw();
+      });
+      requestAnimationFrame(animateBg);
+    }
+    animateBg();
+
+    // --- 2. Interactive Click Heart Burst Effect ---
+    window.addEventListener('click', (e) => {
+      if (e.target.tagName.toLowerCase() === 'canvas') return;
+
+      const heart = document.createElement('div');
+      heart.className = 'click-heart';
+      heart.innerHTML = '<i class="fa-solid fa-heart text-romanticPink text-2xl drop-shadow-md"></i>';
+      heart.style.left = `${e.clientX}px`;
+      heart.style.top = `${e.clientY}px`;
+      document.body.appendChild(heart);
+
+      setTimeout(() => heart.remove(), 1200);
+    });
+
+    // --- 3. Lock Screen Unlock & Audio Trigger ---
+    const lockScreen = document.getElementById('lock-screen');
+    const mainContent = document.getElementById('main-content');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const ytPlayer = document.getElementById('yt-player');
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
+    const audioIcon = document.getElementById('audio-icon');
+    let isPlaying = false;
+
+    unlockBtn.addEventListener('click', () => {
+      lockScreen.style.transform = 'translateY(-100%)';
+      lockScreen.style.opacity = '0';
+      mainContent.classList.remove('opacity-0');
+      mainContent.classList.add('opacity-100');
+
+      setTimeout(() => {
+        ytPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        isPlaying = true;
+      }, 500);
+    });
+
+    audioToggleBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        ytPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        audioIcon.className = 'fa-solid fa-play text-xs';
+        isPlaying = false;
+      } else {
+        ytPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        audioIcon.className = 'fa-solid fa-music text-xs';
+        isPlaying = true;
+      }
+    });
+
+    // --- 4. HTML5 Canvas Scratch-Off Effect Setup ---
+    function setupScratchCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      let isDrawing = false;
+
+      function init() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#e2a970');
+        gradient.addColorStop(0.5, '#f7d399');
+        gradient.addColorStop(1, '#c88a4b');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        for (let i = 0; i < canvas.width; i += 20) {
+          ctx.fillRect(i, 0, 10, canvas.height);
+        }
+
+        ctx.fillStyle = '#4a2c00';
+        ctx.font = 'bold 16px Poppins, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ დააწკაპუნე წასაშლელად', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.font = '12px Poppins, sans-serif';
+        ctx.fillText('(Scratch to reveal)', canvas.width / 2, canvas.height / 2 + 15);
+      }
+
+      function scratch(x, y) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2, false);
+        ctx.fill();
+      }
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      canvas.addEventListener('mousedown', (e) => { isDrawing = true; const pos = getPos(e); scratch(pos.x, pos.y); });
+      canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const pos = getPos(e); scratch(pos.x, pos.y); } });
+      window.addEventListener('mouseup', () => { isDrawing = false; });
+
+      canvas.addEventListener('touchstart', (e) => { isDrawing = true; const pos = getPos(e); scratch(pos.x, pos.y); });
+      canvas.addEventListener('touchmove', (e) => { if (isDrawing) { const pos = getPos(e); scratch(pos.x, pos.y); } });
+      window.addEventListener('touchend', () => { isDrawing = false; });
+
+      canvas.addEventListener('dblclick', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      init();
+    }
+
+    window.addEventListener('load', () => {
+      setupScratchCanvas('scratch-canvas-1');
+      setupScratchCanvas('scratch-canvas-2');
+      setupScratchCanvas('scratch-canvas-3');
+    });
+
+    // --- 5. Interactive Love Reasons Note Stack ---
+    const loveReasons = [
+      "Your genuine smile always brightens my day no matter how tough it is.",
+      "The warm and gentle way you care for people around you.",
+      "How everyday moments feel like magical adventures with you.",
+      "Your laugh is my absolute favorite sound in the world.",
+      "Just thinking of you brings an instant smile to my face. ❤"
+    ];
+
+    let noteIndex = 0;
+    const loveNoteBox = document.getElementById('love-note-box');
+    const nextNoteBtn = document.getElementById('next-note-btn');
+
+    nextNoteBtn.addEventListener('click', () => {
+      loveNoteBox.style.opacity = '0';
+      loveNoteBox.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        loveNoteBox.textConte
+          nt = `"${loveReasons[noteIndex]}"`;
+        loveNoteBox.style.opacity = '1';
+        loveNoteBox.style.transform = 'scale(1)';
+        noteIndex = (noteIndex + 1) % loveReasons.length;
+      }, 200);
+    });
+  </script>
+</body>
+</html>
